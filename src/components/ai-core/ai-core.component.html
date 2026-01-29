@@ -1,0 +1,244 @@
+<div class="h-full flex flex-col animate-fade-in">
+    <div class="flex-shrink-0">
+      <h1 class="text-3xl font-bold text-gray-900">النواة المعرفية والتحليل الذكي</h1>
+      <p class="text-gray-500 mb-6">هذا هو مركز القيادة للتحليل الاستخباراتي. استخدم المساعد الذكي، قم بتحليل الوسائط المتعددة، ولخص النصوص الطويلة بسرعة فائقة لتعزيز قدراتك الاستقصائية.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-i-6" aria-label="Tabs">
+        @if (isChatbotEnabled()) {
+          <button (click)="setTab('assistant')" [class]="activeTab() === 'assistant' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+            المساعد الذكي
+          </button>
+        }
+        @if (isImageAnalysisEnabled()) {
+          <button (click)="setTab('imageAnalysis')" [class]="activeTab() === 'imageAnalysis' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+            تحليل الصور
+          </button>
+        }
+        <button (click)="setTab('transcription')" [class]="activeTab() === 'transcription' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+          التفريغ الصوتي
+        </button>
+        @if (isQuickSummaryEnabled()) {
+          <button (click)="setTab('quickSummary')" [class]="activeTab() === 'quickSummary' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+            تلخيص سريع
+          </button>
+        }
+      </nav>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="flex-grow pt-6 h-full overflow-y-auto">
+        @switch (activeTab()) {
+            @case ('assistant') {
+              <div class="bg-base-100 p-4 rounded-xl shadow h-full flex flex-col">
+                  <!-- Header -->
+                  <div class="flex-shrink-0 flex justify-between items-center pb-3 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                      <div class="w-12 h-12 rounded-full bg-ph-blue-light flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-ph-blue" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+                      </div>
+                      <div>
+                        <h2 class="text-xl font-bold text-gray-900">YemenGPT Assistant</h2>
+                        <p class="text-sm text-gray-500">مساعدك الذكي للتحليل والتحكم بالأدوات</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                      <div>
+                        <label for="system-instruction" class="text-xs font-medium text-gray-500 sr-only">شخصية المساعد:</label>
+                        <select id="system-instruction" [(ngModel)]="selectedInstructionId" title="اختر شخصية المساعد" class="text-xs rounded-md border-gray-300 focus:ring-ph-blue focus:border-ph-blue p-1 bg-gray-50 hover:bg-gray-100">
+                          @for(inst of systemInstructions; track inst.id) {
+                            <option [value]="inst.id">{{ inst.name }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div class="text-xs font-mono px-2 py-1 rounded-md" [ngClass]="currentAiProvider() === 'google' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'">
+                        مزود الخدمة: {{ currentAiProvider() === 'google' ? 'Google Gemini' : 'Local AI' }}
+                      </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="flex-grow overflow-y-auto p-4 space-y-6">
+                    @for(message of messages(); track message.id) {
+                      <div class="group flex items-start gap-3" [class.flex-row-reverse]="message.from === 'user'">
+                          <!-- Avatar -->
+                           @if (message.from === 'ai') {
+                             <div class="w-8 h-8 rounded-full bg-ph-blue text-white flex items-center justify-center flex-shrink-0">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+                             </div>
+                           }
+                          <!-- Message Bubble -->
+                          <div 
+                            class="p-3 rounded-lg max-w-xl"
+                            [class]="message.from === 'user' ? 'bg-ph-blue text-white rounded-ss-none' : 'bg-base-200 text-gray-800 rounded-se-none'">
+                              <p class="text-sm leading-relaxed">{{ message.text }}</p>
+                              @if(message.translatedText) {
+                                <div class="border-t border-gray-400/50 mt-2 pt-2 text-xs opacity-80" [class.text-gray-200/80]="message.from === 'user'" [class.text-gray-700/80]="message.from === 'ai'">
+                                  <p>{{ message.translatedText }}</p>
+                                </div>
+                              }
+                          </div>
+                          <!-- Translate Button -->
+                          @if (currentAiProvider() === 'google' && !message.translatedText) {
+                            <button (click)="translateMessage(message.id)" [disabled]="message.isTranslating" class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-ph-blue self-center">
+                                @if (message.isTranslating) {
+                                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                } @else {
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C13.18 7.061 14.287 7.5 15.5 7.5c1.213 0 2.32-.439 3.166-1.136m0 0 is greater than 3.032 3.032 0 0 1-3.675 3.675-3.032 3.032 0 0 1-3.675-3.675M12 12.75h.008v.008H12v-.008Z" /></svg>
+                                }
+                            </button>
+                          }
+                      </div>
+                    }
+                    @if(isTyping()) {
+                      <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-ph-blue text-white flex items-center justify-center flex-shrink-0">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+                        </div>
+                        <div class="p-3 rounded-lg rounded-se-none bg-base-200">
+                          <div class="flex items-center space-i-2">
+                            <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></span>
+                            <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse [animation-delay:0.2s]"></span>
+                            <span class="w-2 h-2 bg-gray-500 rounded-full animate-pulse [animation-delay:0.4s]"></span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                </div>
+                <!-- Input Area -->
+                <form (submit)="handleSend($event)" class="flex-shrink-0 mt-4 p-2 border-t border-gray-200">
+                    <div class="flex items-center bg-base-200 rounded-lg">
+                        <input #messageInput type="text" placeholder="اسأل YemenGPT أو اطلب منه تشغيل أداة..." class="flex-grow p-3 bg-transparent focus:outline-none text-sm">
+                        <button type="submit" class="p-3 text-ph-blue disabled:text-gray-400" [disabled]="!messageInput.value">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                          </svg>
+                        </button>
+                    </div>
+                     @if (chatError()) {
+                        <p class="text-red-500 text-xs mt-2 text-center">{{ chatError() }}</p>
+                    }
+                </form>
+              </div>
+            }
+            @case ('imageAnalysis') {
+              <app-image-analysis></app-image-analysis>
+            }
+             @case ('quickSummary') {
+              <div class="h-full flex flex-col space-y-4">
+                <textarea [(ngModel)]="summaryInputText" class="w-full flex-grow p-3 rounded-lg border border-gray-300 bg-gray-50 resize-none" placeholder="ألصق النص المراد تلخيصه هنا..."></textarea>
+                <button (click)="getQuickSummary()" [disabled]="isSummarizing() || !summaryInputText()" class="w-full bg-ph-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-ph-blue-dark disabled:bg-gray-400 flex items-center justify-center">
+                   @if(isSummarizing()) {
+                      <span>جارِ التلخيص...</span>
+                   } @else {
+                      <span>لخص النص</span>
+                   }
+                </button>
+                <div class="w-full flex-grow p-3 rounded-lg border border-gray-200 bg-base-200">
+                  <p>{{ summaryResult() || 'ستظهر نتيجة التلخيص هنا.' }}</p>
+                </div>
+              </div>
+            }
+            @case ('transcription') {
+              <div class="bg-base-100 p-6 rounded-xl shadow flex flex-col h-full">
+                <h2 class="text-2xl font-bold mb-4 border-b-2 border-ph-yellow pb-2">التفريغ الصوتي الذكي</h2>
+                <p class="text-gray-600 mb-6">
+                  تحويل صوتي فائق الدقة، مُحسَّن خصيصًا لفهم وتفريغ مختلف اللهجات العربية اليمنية.
+                </p>
+                <div class="space-y-6 flex-grow flex flex-col">
+                  <!-- Step 1: Settings -->
+                  <fieldset>
+                    <legend class="block mb-2 text-sm font-medium text-gray-800">1. اختر إعدادات التفريغ:</legend>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label for="dialect" class="block mb-1 text-xs text-gray-500">اللهجة (لتحسين الدقة)</label>
+                        <select id="dialect" [(ngModel)]="selectedDialect" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5">
+                          @for(dialect of dialects; track dialect) { <option [value]="dialect">{{dialect}}</option> }
+                        </select>
+                      </div>
+                      <div>
+                        <label for="format" class="block mb-1 text-xs text-gray-500">صيغة المخرج</label>
+                        <select id="format" [(ngModel)]="transcriptionFormat" class="bg-gray-50 border border-gray-300 text-sm rounded-lg block w-full p-2.5">
+                          @for(format of outputFormats; track format) { <option [value]="format">{{format}}</option> }
+                        </select>
+                      </div>
+                    </div>
+                  </fieldset>
+
+                  <!-- Step 2: Source -->
+                  <fieldset>
+                    <legend class="block mb-2 text-sm font-medium text-gray-800">2. اختر المصدر:</legend>
+                    @if (showYoutubeInput()) {
+                      <div class="flex">
+                          <input [(ngModel)]="youtubeUrl" type="url" placeholder="https://youtube.com/watch?v=..." class="flex-grow p-2.5 rounded-s-lg border border-gray-300 bg-gray-50 text-sm">
+                          <button (click)="toggleYoutubeInput()" class="p-2.5 text-sm font-medium text-gray-600 bg-gray-100 border border-s-0 border-gray-300 rounded-e-lg hover:bg-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
+                          </button>
+                      </div>
+                    } @else {
+                      <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                          <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                              @if (selectedFile()) {
+                                <p class="text-sm text-green-600 font-semibold px-1 truncate">{{ selectedFile()?.name }}</p>
+                              } @else {
+                                <svg class="w-8 h-8 mb-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">رفع ملف صوتي</span></p>
+                                <p class="text-xs text-gray-500">أو <button (click)="toggleYoutubeInput(); $event.preventDefault()" class="text-ph-blue hover:underline font-semibold">استيراد من يوتيوب</button></p>
+                              }
+                          </div>
+                          <input id="dropzone-file" type="file" class="hidden" (change)="handleFileSelect($event)" accept="audio/*,video/*" />
+                      </label>
+                    }
+                  </fieldset>
+
+                  <!-- Step 3: Preprocessing -->
+                   <fieldset>
+                    <legend class="block mb-2 text-sm font-medium text-gray-800">3. المعالجة المسبقة (اختياري، لتحسين الدقة)</legend>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 border rounded-lg bg-base-200/50">
+                        <label class="flex items-center p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="enableNoiseReduction" name="noiseReduction" class="h-4 w-4 rounded text-ph-blue">
+                            <span class="ms-2 text-sm">تقليل الضوضاء</span>
+                        </label>
+                        <label class="flex items-center p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="enableNormalization" name="normalization" class="h-4 w-4 rounded text-ph-blue">
+                            <span class="ms-2 text-sm">تطبيع الصوت</span>
+                        </label>
+                        <label class="flex items-center p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="enableDiarization" name="diarization" class="h-4 w-4 rounded text-ph-blue">
+                            <span class="ms-2 text-sm">تحديد المتحدثين</span>
+                        </label>
+                    </div>
+                  </fieldset>
+
+                  <!-- Step 4: Transcribe Button & Status -->
+                  <div class="text-center">
+                    @if(isTranscribing()) {
+                        <div class="flex flex-col items-center justify-center text-center">
+                            <svg class="animate-spin h-6 w-6 text-ph-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <p class="mt-2 text-sm font-semibold text-ph-blue">{{ transcriptionStatusText() }}</p>
+                        </div>
+                    } @else {
+                        <button (click)="startTranscription()" [disabled]="(!selectedFile() && !youtubeUrl())" class="w-full bg-ph-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-ph-blue-dark disabled:bg-gray-400">
+                           <span>بدء التفريغ</span>
+                        </button>
+                    }
+                  </div>
+
+                  <!-- Step 5: Result -->
+                  <div class="mt-6 flex-grow flex flex-col">
+                    <label for="transcription-result" class="block mb-2 text-sm font-medium text-gray-800">4. نتيجة التفريغ:</label>
+                    <div class="relative flex-grow">
+                      <textarea id="transcription-result" [value]="transcriptionResult()" readonly class="w-full h-full p-3 rounded-lg border border-gray-300 bg-gray-50 resize-none font-mono text-sm"></textarea>
+                      <button (click)="copyResult()" class="absolute top-2 end-2 px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300">
+                        {{ copySuccess() ? 'تم النسخ!' : 'نسخ' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+        }
+    </div>
+</div>

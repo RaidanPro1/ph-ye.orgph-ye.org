@@ -1,0 +1,75 @@
+<div class="space-y-8 animate-fade-in">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- CPU Stat -->
+    <div class="bg-base-200 p-6 rounded-xl">
+      <h3 class="font-bold text-gray-800">{{ cpuStat().name }}</h3>
+      <p class="text-3xl font-bold my-2">{{ cpuStat().value }}<span class="text-lg">{{ cpuStat().unit }}</span></p>
+      <div class="w-full bg-gray-300 rounded-full h-2.5">
+        <div class="h-2.5 rounded-full" [class]="cpuStat().color" [style.width.%]="cpuStat().value"></div>
+      </div>
+    </div>
+    <!-- RAM Stat -->
+    <div class="bg-base-200 p-6 rounded-xl">
+      <h3 class="font-bold text-gray-800">{{ ramStat().name }}</h3>
+      <p class="text-3xl font-bold my-2">{{ ramStat().value }}<span class="text-lg">{{ ramStat().unit }}</span></p>
+      <div class="w-full bg-gray-300 rounded-full h-2.5">
+        <div class="h-2.5 rounded-full" [class]="ramStat().color" [style.width.%]="ramStat().value"></div>
+      </div>
+    </div>
+    <!-- Disk Stat -->
+    <div class="bg-base-200 p-6 rounded-xl">
+      <h3 class="font-bold text-gray-800">{{ diskStat().name }}</h3>
+      <p class="text-3xl font-bold my-2">{{ diskStat().value }}<span class="text-lg">{{ diskStat().unit }}</span></p>
+      <div class="w-full bg-gray-300 rounded-full h-2.5">
+        <div class="h-2.5 rounded-full" [class]="diskStat().color" [style.width.%]="diskStat().value"></div>
+      </div>
+    </div>
+    <!-- Network Stat -->
+    <div class="bg-base-200 p-6 rounded-xl">
+      <h3 class="font-bold text-gray-800">{{ networkStat().name }}</h3>
+      <p class="text-3xl font-bold my-2">{{ networkStat().value }}<span class="text-lg">{{ networkStat().unit }}</span></p>
+      <div class="w-full bg-gray-300 rounded-full h-2.5">
+        <div class="h-2.5 rounded-full" [class]="networkStat().color" [style.width.%]="networkStat().value / 20 * 100"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">حالة الخدمات الرئيسية</h2>
+          <button (click)="runHealthCheck()" [disabled]="isChecking()" class="px-3 py-1 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400">
+            @if(isChecking()){ <span>جارِ الفحص...</span> } @else { <span>فحص صحة الخدمات</span> }
+          </button>
+        </div>
+        <div class="bg-base-200 p-4 rounded-xl">
+          <ul class="divide-y divide-gray-300">
+            @for (service of services; track service.name) {
+              <li class="py-3 flex justify-between items-center">
+                <span class="font-semibold text-gray-800">{{ service.name }}</span>
+                <div class="flex items-center gap-4">
+                   <button (click)="restartService(service.name)" class="text-xs font-medium text-blue-600 hover:underline">إعادة تشغيل</button>
+                  <div class="flex items-center">
+                    <span class="w-3 h-3 me-2 rounded-full" [ngClass]="service.color.replace('text-', 'bg-')"></span>
+                    <span class="font-bold" [class]="service.color">{{ service.status }}</span>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+       <div>
+        <h2 class="text-xl font-bold mb-4">مراقبة متقدمة</h2>
+         <div class="bg-base-200 p-6 rounded-xl text-center">
+            <h3 class="font-bold text-gray-800">Glances Real-time Monitoring</h3>
+            <p class="text-sm my-2 text-gray-600">
+                للحصول على نظرة تفصيلية ولحظية على جميع موارد الخادم، بما في ذلك العمليات الجارية واستهلاك كل حاوية، استخدم لوحة تحكم Glances.
+            </p>
+            <a href="http://localhost:61208" target="_blank" rel="noopener noreferrer" class="mt-4 inline-block px-5 py-2.5 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
+                فتح لوحة تحكم Glances
+            </a>
+         </div>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="space-y-8 animate-fade-in">
+  <header>
+    <h1 class="text-3xl font-bold text-gray-900">التحكم الإداري</h1>
+    <p class="text-gray-500 mt-1">إدارة شاملة لمنصة YemenJPT، من هنا يمكنك التحكم في الأدوات، المستخدمين، وحالة النظام.</p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="border-b border-gray-200">
+    <nav class="-mb-px flex space-i-6" aria-label="Tabs">
+      <button (click)="activeTab.set('general')" [class]="activeTab() === 'general' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">عام</button>
+      <button (click)="activeTab.set('users')" [class]="activeTab() === 'users' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">المستخدمون</button>
+      <button (click)="activeTab.set('tools')" [class]="activeTab() === 'tools' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">الأدوات</button>
+      @if (isRoot()) {
+        <button (click)="activeTab.set('haqiqa')" [class]="activeTab() === 'haqiqa' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة "حقيقة"</button>
+        <button (click)="activeTab.set('ai-ops')" [class]="activeTab() === 'ai-ops' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">عمليات الذكاء الاصطناعي</button>
+        <button (click)="activeTab.set('email')" [class]="activeTab() === 'email' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">إدارة البريد</button>
+        <button (click)="activeTab.set('logs')" [class]="activeTab() === 'logs' ? 'border-ph-blue text-ph-blue' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">سجل التدقيق</button>
+      }
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="pt-4">
+    @switch (activeTab()) {
+      @case ('general') {
+        <section>
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-ph-yellow pb-2">النظام والبنية التحتية</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="lg:col-span-2 bg-base-100 p-6 rounded-xl shadow">
+              <h3 class="text-xl font-bold mb-4">المراقبة اللحظية للنظام</h3>
+              <app-system-stats></app-system-stats>
+            </div>
+            <div class="bg-base-100 p-6 rounded-xl shadow">
+              <h3 class="text-xl font-bold mb-4">إعدادات الأمان</h3>
+              <app-security-management></app-security-management>
+            </div>
+            @if (isRoot()) {
+              <div class="bg-base-100 p-6 rounded-xl shadow">
+                <h3 class="text-xl font-bold mb-4">مفاتيح API</h3>
+                <app-api-key-management></app-api-key-management>
+              </div>
+            }
+          </div>
+        </section>
+      }
+      @case ('users') {
+        <app-user-management (navigate)="$event"></app-user-management>
+      }
+      @case ('tools') {
+        <app-tool-management></app-tool-management>
+      }
+      @case ('haqiqa') {
+        <app-haqiqa-management></app-haqiqa-management>
+      }
+      @case ('ai-ops') {
+        <app-ai-management></app-ai-management>
+      }
+       @case ('email') {
+        <app-email-management></app-email-management>
+      }
+      @case ('logs') {
+        <app-audit-log></app-audit-log>
+      }
+    }
+  </div>
+</div>
